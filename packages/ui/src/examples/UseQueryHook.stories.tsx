@@ -12,7 +12,7 @@ export default {
 
 // Mock API client to simulate responses (in a real app, this would call your backend)
 const mockApiClient = {
-  query: async (query: string): Promise<any> => {
+  query: async (query) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     

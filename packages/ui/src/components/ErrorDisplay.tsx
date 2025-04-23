@@ -4,81 +4,85 @@ import { ErrorDisplayProps } from '../types';
 /**
  * ErrorDisplay Component
  * 
- * Displays error messages with suggestions when a query fails
+ * Displays error messages in a formatted way
  */
 export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   data,
   className = '',
   style,
 }) => {
-  if (!data || !data.message) {
-    return (
-      <div className={`human1-error-fallback ${className}`}>
-        An unknown error occurred
-      </div>
-    );
+  if (!data) {
+    return null;
   }
 
+  const { message, query, suggestions } = data;
+  
   return (
     <div 
       className={`human1-error-container ${className}`}
       style={{ 
         padding: '16px',
         borderRadius: '4px',
-        backgroundColor: '#fff8f8',
-        border: '1px solid #ffcdd2',
-        color: '#d32f2f',
+        backgroundColor: '#FFF5F5',
+        border: '1px solid #FFCCCC',
+        color: '#E53E3E',
         ...style
       }}
     >
-      <h4 style={{ 
-        margin: '0 0 12px',
-        fontWeight: 600,
-        fontSize: '18px'
+      <div style={{ 
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: (query || suggestions?.length) ? '12px' : '0'
       }}>
-        Error
-      </h4>
-      
-      <p style={{ 
-        margin: '0 0 16px',
-        fontSize: '16px',
-      }}>
-        {data.message}
-      </p>
-
-      {data.query && (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          style={{ marginRight: '8px' }}
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
         <div style={{ 
-          margin: '16px 0',
-          padding: '12px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '4px',
-          fontFamily: 'monospace',
-          fontSize: '14px',
-          overflowX: 'auto',
+          fontWeight: 600,
+          fontSize: '16px',
         }}>
-          <code>{data.query}</code>
+          {message}
+        </div>
+      </div>
+      
+      {query && (
+        <div style={{ 
+          marginTop: '8px',
+          padding: '12px',
+          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          borderRadius: '3px',
+          fontSize: '14px',
+          whiteSpace: 'pre-wrap',
+          overflow: 'auto',
+          fontFamily: 'monospace'
+        }}>
+          <div style={{ fontWeight: 600, marginBottom: '4px' }}>Query:</div>
+          {query}
         </div>
       )}
 
-      {data.suggestions && data.suggestions.length > 0 && (
-        <div style={{ marginTop: '16px' }}>
-          <h5 style={{ 
-            margin: '0 0 8px',
-            fontWeight: 600,
-            fontSize: '16px',
-            color: '#333',
-          }}>
-            Suggestions:
-          </h5>
+      {suggestions && suggestions.length > 0 && (
+        <div style={{ marginTop: '12px' }}>
+          <div style={{ fontWeight: 600, marginBottom: '4px' }}>Suggestions:</div>
           <ul style={{ 
-            margin: '0',
-            paddingLeft: '20px',
-            color: '#333',
+            marginLeft: '20px',
+            paddingLeft: '0'
           }}>
-            {data.suggestions.map((suggestion, index) => (
-              <li key={`suggestion-${index}`} style={{ margin: '4px 0' }}>
-                {suggestion}
-              </li>
+            {suggestions.map((suggestion, index) => (
+              <li key={index} style={{ marginBottom: '4px' }}>{suggestion}</li>
             ))}
           </ul>
         </div>

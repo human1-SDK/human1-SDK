@@ -13,7 +13,9 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "moduleResolution": "node",
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.tsx", "**/*.test.ts", "**/*.stories.tsx"]

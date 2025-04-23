@@ -13,7 +13,7 @@ export default {
 
 // Mock API client to simulate responses (in a real app, this would call your backend)
 const mockApiClient = {
-  query: async (query: string): Promise<any> => {
+  query: async (query) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -47,13 +47,14 @@ export const BasicExample = () => {
   const [result, setResult] = useState<ResponseData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleSubmit = async (queryText: string) => {
+  const handleSubmit = async (queryText, type: 'paragraph' | 'table' = 'paragraph') => {
     setIsLoading(true);
     try {
       const response = await mockApiClient.query(queryText);
       
-      // Format the response based on its structure
-      if (response.columns && response.rows) {
+      // If the user wants a table and we have table data, or if the query suggests table data
+      if ((type === 'table' && response.columns && response.rows) || 
+          (queryText.toLowerCase().includes('sales') && response.columns && response.rows)) {
         setResult({
           type: 'table',
           data: {
