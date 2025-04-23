@@ -1,0 +1,40 @@
+{
+  "name": "@human1-sdk/ui",
+  "version": "0.1.0",
+  "description": "UI components for Human1 SDK",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "keywords": [
+    "human1",
+    "sdk",
+    "ui",
+    "components"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@human1-sdk/core": "^0.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5",
+    "jest": "^29.5.0",
+    "@types/jest": "^29.5.0",
+    "@types/react": "^18.0.38",
+    "@types/react-dom": "^18.0.11",
+    "eslint": "^8.38.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
+  }
+} 
