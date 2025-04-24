@@ -52,7 +52,7 @@ const pgpool = new Pool({
   user: 'naj', // usually "postgres"
   host: '13.216.46.170', // or wherever your DB is hosted
   database: 'postgres',
-  password: 'naj',
+  password: process.env.PG_PW,
   port: 5432, // default PostgreSQL port
 });
 
