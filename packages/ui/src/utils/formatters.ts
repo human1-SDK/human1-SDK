@@ -55,7 +55,7 @@ export const formatQueryResponse = (result: any): ResponseData => {
       // If data is an array of objects, convert to a table
       if (Array.isArray(result.data) && result.data.length > 0 && typeof result.data[0] === 'object') {
         const columns = Object.keys(result.data[0]);
-        const rows = result.data.map(item => columns.map(key => item[key]));
+        const rows = result.data.map((item: Record<string, any>) => columns.map(key => item[key]));
         return {
           type: 'table',
           data: { columns, rows } as TableData
