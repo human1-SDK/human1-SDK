@@ -1,12 +1,8 @@
 import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-
-import { parseNaturalLanguageQuery } from './controllers/naturalLanguageController.js';
-import { queryOpenAI } from './controllers/openaiController.js';
-import { queryStarWarsDatabase } from './controllers/databaseController.js';
-
 import { ServerError } from './types.js';
+import { mockHandler } from './controllers/mockController.js';
 
 const app = express();
 
@@ -15,9 +11,7 @@ app.use(express.json());
 
 app.post(
   '/api',
-  parseNaturalLanguageQuery,
-  queryOpenAI,
-  queryStarWarsDatabase,
+  mockHandler,
   (_req, res) => {
     res.status(200).json({
       databaseQuery: res.locals.databaseQuery,
