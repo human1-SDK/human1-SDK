@@ -49,7 +49,7 @@ async function langchainSQL(userQuery: string): Promise<any> {
 }
 
 const pgpool = new Pool({
-  user: 'naj', // usually "postgres"
+  user: process.env.PG_USER,
   host: '13.216.46.170', // or wherever your DB is hosted
   database: 'postgres',
   password: process.env.PG_PW,
