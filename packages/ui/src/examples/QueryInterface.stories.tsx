@@ -52,9 +52,8 @@ export const BasicExample = () => {
     try {
       const response = await mockApiClient.query(queryText);
       
-      // If the user wants a table and we have table data, or if the query suggests table data
-      if ((type === 'table' && response.columns && response.rows) || 
-          (queryText.toLowerCase().includes('sales') && response.columns && response.rows)) {
+      // Format the response based on its structure and requested type
+      if (type === 'table' && response.columns && response.rows) {
         setResult({
           type: 'table',
           data: {
