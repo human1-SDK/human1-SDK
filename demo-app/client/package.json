@@ -1,0 +1,29 @@
+{
+  "name": "human1-sdk-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@human1-sdk/ui": "file:../../human1-SDK/packages/ui",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "dev": "npm run link-sdk && npm run rebuild-ui && vite",
+    "build": "npm run link-sdk && npm run rebuild-ui && vite build",
+    "preview": "npm run link-sdk && npm run rebuild-ui && vite preview",
+    "rebuild-ui": "node ./.scripts/b-hu-ui/rebuild-ui.js",
+    "link-sdk": "node ./.scripts/link-sdk.js"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.4.1",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^4.9.5",
+    "vite": "^5.0.0"
+  }
+}

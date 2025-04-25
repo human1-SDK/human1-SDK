@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Human1 SDK Server API",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run link-sdk && tsx watch src/index.ts",
+    "dev:ts-node-dev": "npm run link-sdk && ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:nodemon": "npm run link-sdk && nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "build": "npm run link-sdk && tsc",
+    "start": "npm run link-sdk && node dist/index.js",
+    "link-sdk": "node ./.scripts/link-sdk.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@human1-sdk/core": "file:../../human1-SDK/packages/core",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}
