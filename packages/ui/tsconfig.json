@@ -14,7 +14,6 @@
     "allowJs": true,
     "moduleResolution": "node",
     "noEmitOnError": false,
-    "allowImportingTsExtensions": true,
     "emitDeclarationOnly": true
   },
   "include": ["src/**/*"],

@@ -6,10 +6,10 @@
 
 // Export components
 export { QueryInput } from './components/QueryInput.jsx';
-export { QueryResponseDisplay } from './components/QueryResponseDisplay.tsx';
-export { TableView } from './components/TableView.tsx';
-export { ParagraphView } from './components/ParagraphView.tsx';
-export { ErrorDisplay } from './components/ErrorDisplay.tsx';
+export { QueryResponseDisplay } from './components/QueryResponseDisplay';
+export { TableView } from './components/TableView';
+export { ParagraphView } from './components/ParagraphView';
+export { ErrorDisplay } from './components/ErrorDisplay';
 
 // Export hooks
 export { useNaturalLanguageQuery } from './hooks/useNaturalLanguageQuery';
