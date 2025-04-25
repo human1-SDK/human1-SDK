@@ -5,7 +5,7 @@
  */
 
 // Export components
-export { QueryInput } from './components/QueryInput.jsx';
+export { QueryInput } from './components/QueryInput';
 export { QueryResponseDisplay } from './components/QueryResponseDisplay';
 export { TableView } from './components/TableView';
 export { ParagraphView } from './components/ParagraphView';
