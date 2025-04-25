@@ -71,7 +71,7 @@ function App() {
         
         <div className="bg-white rounded-lg shadow p-6">
           <FileDropZone 
-            onFilesAccepted={handleFilesAccepted}
+            onFilesSelected={handleFilesAccepted}
           />
         </div>
 

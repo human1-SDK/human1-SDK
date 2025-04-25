@@ -8,6 +8,7 @@ export const apiClient: QueryClient = {
   query: async (query: string): Promise<QueryResult> => {
     try {
       const response = await axios.post(`${API_URL}/api/query`, { query });
+      console.log('response', response);
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
