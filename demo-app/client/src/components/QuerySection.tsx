@@ -2,31 +2,28 @@ import React from 'react';
 import { QueryInput, QueryResponseDisplay } from '@human1-sdk/ui';
 
 interface QuerySectionProps {
-  executeQuery: (query: string) => void;
+  executeQuery: (query: string, responseFormat?: 'paragraph' | 'table') => void;
   isLoading: boolean;
-  query: string;
   result: any;
 }
 
 const QuerySection: React.FC<QuerySectionProps> = ({
   executeQuery,
   isLoading,
-  query,
-  result
+  result,
 }) => {
   return (
     <>
-      <QueryInput 
+      <QueryInput
         onSubmit={executeQuery}
         isLoading={isLoading}
-        initialValue={query}
         placeholder="Ask a question about your data..."
         className="mb-6"
       />
-      
+
       {result && (
         <div className="mt-8">
-          <QueryResponseDisplay 
+          <QueryResponseDisplay
             data={result}
             className="border rounded-lg p-4"
           />
@@ -36,4 +33,4 @@ const QuerySection: React.FC<QuerySectionProps> = ({
   );
 };
 
-export default QuerySection; 
+export default QuerySection;

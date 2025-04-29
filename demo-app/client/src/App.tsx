@@ -79,7 +79,6 @@ function App() {
           <QuerySection 
             executeQuery={executeQuery}
             isLoading={isLoading}
-            query={query}
             result={result}
           />
           

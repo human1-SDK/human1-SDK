@@ -1,4 +1,4 @@
-import { RequestHandler, Request } from 'express';
+import { RequestHandler, Request, response } from 'express';
 import { Client } from '@human1-sdk/core';
 // import 'dotenv/config';
 import * as dotenv from 'dotenv';
@@ -26,16 +26,17 @@ const human1Client = new Client({
 
 // Execute a natural language query
 export const executeQuery: RequestHandler = async (
-  req: Request<any, any, { query: string }>,
+  req: Request<any, any, { query: string, responseFormat?: "table" | "paragraph" }>,
   res
 ) => {
   try {
-    const { query } = req.body;
-    console.log("body", req.body);
+    const { query, responseFormat } = req.body;
+    console.log('body', req.body);
     if (!query) {
       res.status(400).json({ error: 'Query is required' });
     }
-    const result = await human1Client.langchainSQL(query);
+    const result = await human1Client.langchainSQL(query, responseFormat);
+    console.log('langchainSQL result', result);
 
     // Store in history
     queryHistory.push({

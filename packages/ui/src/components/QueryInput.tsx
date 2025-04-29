@@ -18,13 +18,14 @@ export const QueryInput: React.FC<QueryInputProps> = ({
   style,
 }) => {
   const [query, setQuery] = useState(initialValue);
-  const [type, setType] = useState<'paragraph' | 'table'>('paragraph');
+  const [responseFormat, setResponseFormat] = useState<'paragraph' | 'table'>('paragraph');
   
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (query.trim() && !isLoading) {
-      onSubmit(query.trim(), type);
+      console.log("responseFormat", responseFormat);
+      onSubmit(query.trim(), responseFormat);
     }
   };
 
@@ -34,8 +35,8 @@ export const QueryInput: React.FC<QueryInputProps> = ({
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <label style={{ marginRight: '8px', fontSize: '14px' }}>Response type:</label>
           <select 
-            value={type}
-            onChange={(e) => setType(e.target.value as 'paragraph' | 'table')}
+            value={responseFormat}
+            onChange={(e) => setResponseFormat(e.target.value as 'paragraph' | 'table')}
             style={{
               padding: '4px 8px',
               border: '1px solid #ccc',

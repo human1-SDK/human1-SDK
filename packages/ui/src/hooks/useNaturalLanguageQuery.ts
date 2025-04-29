@@ -12,7 +12,7 @@ type ClientType = {
    * @param query The natural language query string
    * @returns Promise resolving to the query response
    */
-  query: (query: string) => Promise<any>;
+  query: (query: string, responseFormat?: 'table' | 'paragraph') => Promise<any>;
 };
 
 interface UseNaturalLanguageQueryOptions {
@@ -63,7 +63,7 @@ interface UseNaturalLanguageQueryResult {
   /**
    * Function to execute the query
    */
-  executeQuery: (queryText?: string) => Promise<void>;
+  executeQuery: (queryText?: string, responseFormat?: 'table' | 'paragraph') => Promise<void>;
   /**
    * Reset the query state
    */
@@ -83,7 +83,7 @@ export const useNaturalLanguageQuery = (
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const executeQuery = useCallback(async (queryText?: string) => {
+  const executeQuery = useCallback(async (queryText?: string, responseFormat?: 'table' | 'paragraph') => {
     const queryToExecute = queryText || query;
     
     if (!queryToExecute.trim()) {
@@ -102,7 +102,7 @@ export const useNaturalLanguageQuery = (
     setError(null);
 
     try {
-      const response = await client.query(queryToExecute);
+      const response = await client.query(queryToExecute, responseFormat);
       const formattedResult = formatQueryResponse(response);
       setResult(formattedResult);
       

@@ -55,12 +55,20 @@ export class Client {
     });
   }
 
-  async langchainSQL(userQuery: string): Promise<any> {
+  async langchainSQL(userQuery: string, responseFormat?: "table" | "paragraph"): Promise<any> {
     // const promptTemplate =
     //   'Translate this sentence to a SQL query. dont show more than 1000 records. avoid sql keywords and Use ONLY these tables:\n\n{table_info}\n\nQuestion: {input}';
     const prompt = await pull<ChatPromptTemplate>(
       "hwchase17/openai-tools-agent"
     );
+
+    const customPrompt = ChatPromptTemplate.fromMessages([
+      [
+        "system",
+        "You are a helpful assistant. Respond only with JSON format only",
+      ],
+      ...prompt.promptMessages,
+    ]);
 
     //Langchain-SQL Connection <<<
     // Create a LangChain SqlDatabase from TypeORM DataSource
@@ -74,7 +82,7 @@ export class Client {
     const agent = await createOpenAIToolsAgent({
       llm: this.llm,
       tools: toolkit.tools,
-      prompt: prompt,
+      prompt: customPrompt,
     });
 
     // Create the agent executor
