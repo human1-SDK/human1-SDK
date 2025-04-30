@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Custom base styles that should be available to all components */
+:root {
+  --color-primary: var(--color-blue-500);
+  --color-secondary: var(--color-gray-200);
+}
+
+/* Custom component styles that should be available to all components */
+@utility btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+@utility btn-primary {
+  background-color: var(--color-blue-500);
+  color: white;
+}
+
+@utility btn-primary:hover {
+  background-color: var(--color-blue-600);
+}
+
+@utility btn-secondary {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-800);
+}
+
+@utility btn-secondary:hover {
+  background-color: var(--color-gray-300);
+} 

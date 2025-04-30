@@ -1,58 +1,45 @@
-import { useState, useCallback } from 'react';
-
-export interface QueryResult {
-  type: 'table' | 'paragraph' | 'error';
-  data: {
-    columns?: string[];
-    rows?: any[][];
-    text?: string;
-    message?: string;
-    suggestions?: string[];
-  };
-}
-
-export interface QueryClient {
-  query: (query: string) => Promise<QueryResult>;
-}
+import { useState } from 'react';
+import { ResponseData } from '../types';
 
 interface UseNaturalLanguageQueryOptions {
-  client: QueryClient;
-  onSuccess?: (result: QueryResult) => void;
+  client: {
+    executeQuery: (query: string) => Promise<ResponseData>;
+  };
+  onSuccess?: (result: ResponseData) => void;
   onError?: (error: Error) => void;
 }
 
-export const useNaturalLanguageQuery = ({
-  client,
-  onSuccess,
-  onError
-}: UseNaturalLanguageQueryOptions) => {
+export const useNaturalLanguageQuery = (options: UseNaturalLanguageQueryOptions) => {
+  const { client, onSuccess, onError } = options;
+  
   const [query, setQuery] = useState('');
-  const [result, setResult] = useState<QueryResult | null>(null);
+  const [result, setResult] = useState<ResponseData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const executeQuery = useCallback(async () => {
-    if (!query.trim()) return;
-
-    setIsLoading(true);
+  
+  const executeQuery = async (queryText: string) => {
     try {
-      const result = await client.query(query);
-      setResult(result);
-      onSuccess?.(result);
+      setIsLoading(true);
+      setQuery(queryText);
+      
+      const response = await client.executeQuery(queryText);
+      
+      setResult(response);
+      if (onSuccess) {
+        onSuccess(response);
+      }
+      
+      return response;
     } catch (error) {
-      const errorResult: QueryResult = {
-        type: 'error',
-        data: {
-          message: error instanceof Error ? error.message : 'An unknown error occurred',
-          suggestions: ['Try rephrasing your question', 'Check for typos in your query']
-        }
-      };
-      setResult(errorResult);
-      onError?.(error instanceof Error ? error : new Error('Unknown error'));
+      console.error('Error executing query:', error);
+      if (onError && error instanceof Error) {
+        onError(error);
+      }
+      throw error;
     } finally {
       setIsLoading(false);
     }
-  }, [query, client, onSuccess, onError]);
-
+  };
+  
   return {
     query,
     setQuery,

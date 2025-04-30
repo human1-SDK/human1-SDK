@@ -1,5 +1,47 @@
 {
+  "name": "human1-sdk-demo-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "demo-app/*"
+  ],
+  "dependencies": {
+    "@human1-sdk/core": "workspace:*",
+    "@human1-sdk/ui": "workspace:*"
+  },
+  "scripts": {
+    "dev": "node start-dev.mjs",
+    "dev:client": "cd demo-app/ && npm run dev",
+    "dev:full": "cd demo-app/ && npm run dev:full",
+    "dev:with-sdk": "concurrently \"npm run watch-sdk\" \"cd demo-app/ && npm run dev\"",
+    "watch-sdk": "nodemon --watch packages/ui/src --ext ts,tsx,js,jsx,css --exec \"npm run build-sdk\"",
+    "build-sdk": "cd packages/ui && npm run build",
+    "build": "npm run build-sdk && cd demo-app/client && vite build",
+    "preview": "cd demo-app/client && vite preview --host --port 4174",
+    "clean": "rm -rf demo-app/client/dist",
+    "clean:all": "rm -rf demo-app/client/dist node_modules package-lock.json && cd packages/ui && npm run clean",
+    "clean:unix": "npm run cleanup:full && npm run cleanup:npm",
+    "cleanup:npm": "npm cache clean --force",
+    "cleanup:full": "find . -name 'node_modules' -type d -prune -exec rm -rf {} \\; && find . -name 'dist' -type d -prune -exec rm -rf {} \\; && find . -name '.turbo' -type d -prune -exec rm -rf {} \\; && find . -name 'storybook-static' -type d -prune -exec rm -rf {} \\; && find . -name '.whiteboard' -type d -prune -exec rm -rf {} \\; && find . -name '*.timestamp-*.mjs' -type f -exec rm -f {} \\; && find . -name 'tailwind-output.css' -type f -exec rm -f {} \\; && echo 'Full cleanup completed!'",
+    "cleanup:build": "find . -name 'dist' -type d -prune -exec rm -rf {} \\; && find . -name '.turbo' -type d -prune -exec rm -rf {} \\; && find . -name 'storybook-static' -type d -prune -exec rm -rf {} \\; && find . -name '.whiteboard' -type d -prune -exec rm -rf {} \\; && find . -name '*.timestamp-*.mjs' -type f -exec rm -f {} \\; && find . -name 'tailwind-output.css' -type f -exec rm -f {} \\; && echo 'Build cleanup completed!'",
+    "dev:classic": "cd demo-app/client && npm run dev:classic",
+    "typecheck": "tsc -b",
+    "typecheck:client": "cd demo-app/client && npm run typecheck",
+    "typecheck:ui": "cd packages/ui && tsc --noEmit"
+  },
   "devDependencies": {
-    "@types/jest": "^29.5.14"
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.0.0",
+    "concurrently": "^8.0.0",
+    "nodemon": "^3.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0"
   }
 }

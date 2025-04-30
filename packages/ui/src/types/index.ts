@@ -18,7 +18,7 @@ export interface BaseProps {
  */
 export interface QueryInputProps extends BaseProps {
   /** Callback function triggered when a query is submitted */
-  onSubmit: (query: string, type?: 'paragraph' | 'table') => void;
+  onSubmit: (query: string, responseFormat?: 'paragraph' | 'table') => void;
   /** Loading state to display spinner/disabled state */
   isLoading?: boolean;
   /** Placeholder text for the input */
@@ -106,3 +106,5 @@ export interface ErrorDisplayProps extends BaseProps {
   /** Error data to display */
   data: ErrorData;
 } 
+
+export * from './fileDropZone'; 

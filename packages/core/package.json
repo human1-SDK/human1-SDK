@@ -1,6 +1,7 @@
 {
   "name": "@human1-sdk/core",
   "version": "0.1.0",
+  "private": false,
   "description": "Core functionality for Human1 SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,8 +10,11 @@
   ],
   "scripts": {
     "build": "tsc",
+    "dev": "tsc --watch",
     "test": "jest",
-    "lint": "eslint src --ext .ts,.tsx"
+    "clean": "rm -rf dist",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "human1",
@@ -20,11 +24,20 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@langchain/openai": "^0.5.7",
+    "dotenv": "^16.0.0",
+    "langchain": "^0.3.24",
+    "pg": "^8.15.6",
+    "typeorm": "^0.3.22"
   },
   "devDependencies": {
-    "typescript": "^4.9.5",
-    "jest": "^29.5.0",
-    "@types/jest": "^29.5.0",
-    "eslint": "^8.38.0"
+    "@types/cors": "^2.0.0",
+    "@types/express": "^5.0.0",
+    "cors": "^2.0.0",
+    "express": "^5.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^9.0.0"
   }
-} 
+}

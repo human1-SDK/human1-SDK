@@ -1,18 +1,18 @@
 {
-  "name": "human1-app-workspace",
+  "name": "human1-sdk-demo",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start:client": "cd client && npm run dev",
-    "start:server": "cd server && npm run dev",
+    "build:ui": "cd ../packages/ui && npm run build",
+    "dev": "npm run build:ui && cd client && npm run dev",
+    "dev:full": "echo '\n📱 STARTING HUMAN1 SDK DEMO...\n' && concurrently \"cd server && npm run dev\" \"npm run dev\" ",
+    "dev:classic": "npm run build:ui && cd client && npm run dev:classic",
+    "build": "npm run build:ui && cd client && npm run build",
     "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
-    "dev": "npm run start:server & ./node_modules/.bin/wait-on http://localhost:3001/health && npm run start:client",
-    "build:client": "cd client && npm run build",
-    "build:server": "cd server && npm run build",
-    "build": "npm run build:client && npm run build:server"
+    "start:client": "cd client && npm run preview",
+    "start:server": "cd server && npm run start"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0"
+    "concurrently": "^9.1.0"
   }
 }

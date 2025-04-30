@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/ui" },
+    { "path": "./packages/core" },
+    { "path": "./demo-app/client" },
+    { "path": "./demo-app/server" }
+  ]
+} 

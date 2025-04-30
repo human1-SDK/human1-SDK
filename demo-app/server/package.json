@@ -1,35 +1,38 @@
 {
-  "name": "server",
-  "version": "1.0.0",
+  "name": "human1-sdk-demo-server",
+  "version": "0.1.0",
+  "private": true,
   "description": "Human1 SDK Server API",
   "main": "dist/index.js",
-  "type": "module",
   "scripts": {
-    "dev": "npm run link-sdk && tsx watch src/index.ts",
-    "dev:ts-node-dev": "npm run link-sdk && ts-node-dev --respawn --transpile-only src/index.ts",
-    "dev:nodemon": "npm run link-sdk && nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "build": "npm run link-sdk && tsc",
-    "start": "npm run link-sdk && node dist/index.js",
-    "link-sdk": "node ./.scripts/link-sdk.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:classic": "tsx watch --ignore node_modules src/index.ts",
+    "dev": "npm run build:core && npm run dev:with-core",
+    "dev:with-core": "concurrently \"npm run watch-core\" \"npm run dev:classic\"",
+    "dev:script": "npm run build:core && tsx watch --ignore node_modules src/index.ts",
+    "watch-core": "nodemon --quiet --watch ../../packages/core/src --ext ts,js --delay 1000ms --exec \"cd ../../packages/core && npm run build --silent\"",
+    "build": "tsc",
+    "build:core": "cd ../../packages/core && npm run build",
+    "start": "node --es-module-specifier-resolution=node dist/index.js",
+    "clean": "rm -rf dist",
+    "clean:all": "rm -rf dist node_modules package-lock.json && cd ../../packages/core && npm run clean",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@human1-sdk/core": "file:../../human1-SDK/packages/core",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "@human1-sdk/core": "file:../../packages/core",
+    "cors": "^2.0.0",
+    "dotenv": "^16.0.0",
+    "express": "^5.0.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.14.1",
-    "nodemon": "^3.1.10",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.3"
+    "@types/cors": "^2.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "concurrently": "^8.0.0",
+    "nodemon": "^3.0.1",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
   }
 }

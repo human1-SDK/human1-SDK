@@ -15,4 +15,9 @@ export interface ApiResponse<T> {
   };
 }
 
+/**
+ * Function that takes a query string and returns a formatted message
+ */
+export type QueryLogger = (query: string) => string;
+
 // Add more type definitions as needed 

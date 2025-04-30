@@ -1,29 +1,33 @@
 {
-  "name": "human1-sdk-demo",
+  "name": "human1-sdk-demo-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@human1-sdk/ui": "file:../../human1-SDK/packages/ui",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@human1-sdk/ui": "file:../../packages/ui",
+    "axios": "^1.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0"
   },
   "scripts": {
-    "dev": "npm run link-sdk && npm run rebuild-ui && vite",
-    "build": "npm run link-sdk && npm run rebuild-ui && vite build",
-    "preview": "npm run link-sdk && npm run rebuild-ui && vite preview",
-    "rebuild-ui": "node ./.scripts/b-hu-ui/rebuild-ui.js",
-    "link-sdk": "node ./.scripts/link-sdk.js"
+    "dev": "NODE_ENV=development VITE_UI_SRC=true npx vite --force",
+    "dev:script": "NODE_ENV=development VITE_UI_SRC=true npx vite --force",
+    "build": "NODE_ENV=production npx vite build",
+    "preview": "npx vite preview",
+    "clean": "rm -rf dist",
+    "clean:all": "rm -rf dist node_modules package-lock.json && cd ../../packages/ui && npm run clean",
+    "typecheck": "tsc --noEmit",
+    "reset-cache": "rm -rf node_modules/.vite"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.0",
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
-    "@vitejs/plugin-react": "^4.4.1",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.4",
-    "typescript": "^4.9.5",
-    "vite": "^5.0.0"
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0"
   }
 }
