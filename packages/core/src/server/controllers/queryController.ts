@@ -57,30 +57,69 @@ export const executeQuery: QueryHandler = async (requestData) => {
     const logMessage = logQueryMessage(query);
     console.log('--------------------------\n');
     
-    // Use Human1 SDK to process the query
-    // Note: Implement actual query processing using the SDK's methods
-    // This is a placeholder implementation
-    // const result = { 
-    //   message: 'Query processed successfully',
-    //   data: `Result for: ${query}`,
-    //   logMessage,
-    //   // In a real implementation, you'd call human1Client methods here
-    // };
-    
-    const result = await human1Client.langchainSQL(query, responseFormat);
-    console.log('langchainSQL result', result);
+    try {
+      // Get result from Human1 client
+      const result = await human1Client.langchainSQL(query, responseFormat);
+      console.log('langchainSQL result', result);
 
-    // Store in history
-    queryHistory.push({
-      query,
-      result,
-      timestamp: new Date(),
-    });
+      // Handle the result appropriately based on its format
+      if (responseFormat === 'paragraph') {
+        // For paragraph format, the result should already have the text property
+        // from the improved langchainSQL function
+        if (result && typeof result.text === 'string') {
+          const formattedResult = {
+            text: result.text
+          };
+          
+          // Store in history
+          queryHistory.push({
+            query,
+            result: formattedResult,
+            timestamp: new Date(),
+          });
+          
+          return {
+            status: 200,
+            data: formattedResult
+          };
+        }
+      }
+      
+      // No special formatting needed for table format or if the paragraph
+      // formatting was already handled in langchainSQL
+      
+      // Store in history
+      queryHistory.push({
+        query,
+        result,
+        timestamp: new Date(),
+      });
 
-    return {
-      status: 200,
-      data: result
-    };
+      return {
+        status: 200,
+        data: result
+      };
+    } catch (error) {
+      console.error('Error executing langchainSQL:', error);
+      
+      // Create appropriate error response based on format
+      if (responseFormat === 'paragraph') {
+        return {
+          status: 500,
+          data: {
+            text: `Error: ${error instanceof Error ? error.message : String(error)}`
+          }
+        };
+      } else {
+        return {
+          status: 500,
+          data: {
+            columns: ['Error'],
+            rows: [[`${error instanceof Error ? error.message : String(error)}`]]
+          }
+        };
+      }
+    }
   } catch (error) {
     console.error('Error executing query:', error);
     return {
