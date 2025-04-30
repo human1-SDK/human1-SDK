@@ -10,7 +10,10 @@ router.get('/hello', (req, res) => {
 
 // Query endpoints
 // @ts-ignore - Express 5 typing issues
-router.post('/query', executeQuery);
+router.post('/query', (req, res, next) => {
+  console.log('Received query:', req.body.query);
+  return next();
+}, executeQuery);
 // @ts-ignore - Express 5 typing issues
 router.get('/query/history', getQueryHistory);
 

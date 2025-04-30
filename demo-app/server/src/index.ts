@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { routes } from './routes';
+import { executeQuery } from './controllers/queryController';
 
 // Load environment variables
 dotenv.config();
@@ -16,6 +17,16 @@ app.use(express.json());
 
 // Routes
 app.use('/api', routes);
+
+// app.post('/api/query', (req, res, next) => {
+//   console.log("middleware here")
+//   console.log('Received query:', req.body.query);
+//   return next();
+// }, 
+// // (req, res, next) => {
+// //   res.send('Query received!');
+// // },)
+// executeQuery);
 
 // Health check endpoint
 app.get('/health', (req: express.Request, res: express.Response) => {

@@ -2,7 +2,7 @@ declare module '@human1-sdk/ui' {
   import { ReactNode, FC, CSSProperties } from 'react';
   
   export interface QueryInputProps {
-    onSubmit: (query: string, type?: 'paragraph' | 'table') => void;
+    onSubmit: (query: string, responseFormat?: 'paragraph' | 'table') => void;
     isLoading?: boolean;
     placeholder?: string;
     initialValue?: string;
@@ -56,7 +56,7 @@ declare module '@human1-sdk/ui' {
     result: ResponseData | null;
     isLoading: boolean;
     error: Error | null;
-    executeQuery: (queryText?: string) => Promise<void>;
+    executeQuery: (queryText?: string, responseFormat?: "table" | "paragraph") => Promise<void>;
     reset: () => void;
   }
   

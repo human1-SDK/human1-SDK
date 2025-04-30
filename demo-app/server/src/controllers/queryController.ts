@@ -1,45 +1,56 @@
-import express from 'express';
+import { RequestHandler, Request, response } from 'express';
 import { Client } from '@human1-sdk/core';
-
+// import 'dotenv/config';
+import * as dotenv from 'dotenv';
+dotenv.config();
 // Store query history in memory (in a real app, you'd use a database)
-const queryHistory: Array<{ query: string, result: any, timestamp: Date }> = [];
+const queryHistory: Array<{ query: string; result: any; timestamp: Date }> = [];
+console.log('env', process.env.PG_PW);
+console.log('env', process.env.PG_USER);
 
 // Initialize Human1 client
 const human1Client = new Client({
-  apiKey: process.env.HUMAN1_API_KEY || '',
+  openAiKey: process.env.OPENAI_API_KEY as string,
+  db: {
+    type: 'postgres',
+    host: process.env.DB_HOST as string,
+    port: 5432, // defaults to 5432 for PostgreSQL
+    username: process.env.PG_USER as string,
+    password: process.env.PG_PW as string,
+    database: process.env.DB_NAME as string,
+    ssl: {
+      rejectUnauthorized: false, // if you're using Supabase or SSL-enabled DB
+    },
+  },
 });
 
 // Execute a natural language query
-export const executeQuery = async (req: any, res: any) => {
+export const executeQuery: RequestHandler = async (
+  req: Request<any, any, { query: string, responseFormat?: "table" | "paragraph" }>,
+  res
+) => {
   try {
-    const { query } = req.body;
-    
+    const { query, responseFormat } = req.body;
+    console.log('body', req.body);
     if (!query) {
-      return res.status(400).json({ error: 'Query is required' });
+      res.status(400).json({ error: 'Query is required' });
     }
-    
-    // Use Human1 SDK to process the query
-    // Note: Implement actual query processing using the SDK's methods
-    // This is a placeholder implementation
-    const result = { 
-      message: 'Query processed successfully',
-      data: `Result for: ${query}`,
-      // In a real implementation, you'd call human1Client methods here
-    };
-    
+    const result = await human1Client.langchainSQL(query, responseFormat);
+    console.log('langchainSQL result', result);
+
     // Store in history
     queryHistory.push({
       query,
       result,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
-    
-    return res.status(200).json(result);
+
+    res.status(200).json(result);
   } catch (error) {
     console.error('Error executing query:', error);
-    return res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to process query',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -50,9 +61,9 @@ export const getQueryHistory = (req: any, res: any) => {
     return res.status(200).json(queryHistory);
   } catch (error) {
     console.error('Error retrieving query history:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Failed to retrieve query history',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
-}; 
+};
