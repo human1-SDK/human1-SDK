@@ -69,7 +69,7 @@ export class Client {
       temperature: 0.5,
       apiKey: this.openAiKey,
       modelKwargs: {
-        response_format: "json_object",
+        response_format: {type: "json_object"},   // NAT CHANGES
       },
     });
   }
@@ -123,9 +123,27 @@ export class Client {
       table: res.output,
     };
 
-    console.log(langChainResponse.table);
+    const parsed = JSON.parse(langChainResponse.table);
 
-    return langChainResponse;
+    // Get the first array of objects from the parsed object
+    const firstKey = Object.keys(parsed)[0];
+    const records = parsed[firstKey];
+
+    // Validate it's an array of objects
+    if (!Array.isArray(records) || records.length === 0 || typeof records[0] !== 'object') {
+      throw new Error("Unexpected format: expected an array of objects.");
+    }
+
+    // Dynamically extract columns and rows
+    const columns = Object.keys(records[0]);
+    const rows = records.map(record => columns.map(col => record[col]));
+
+    const returnData =  {
+      columns,
+      rows,
+    };
+
+    return returnData;
   }
 }
 

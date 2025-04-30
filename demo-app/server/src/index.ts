@@ -23,6 +23,18 @@ app.use(express.json());
 console.log('\nInitializing SDK with auto-detection...');
 const serverResult = sdk();
 
+// Verify that the SDK properly detected our Express app
+const detectedApp = sdk.getExpressApp();
+if (!detectedApp) {
+  console.log('Express app auto-detection failed - setting app explicitly');
+  sdk.express(app);
+} else if (detectedApp !== app) {
+  console.log('Wrong Express app detected - correcting with explicit setting');
+  sdk.express(app);
+} else {
+  console.log('Express app auto-detection succeeded!');
+}
+
 // Mount demo app routes using Express
 app.use('/', appRoutes);
 

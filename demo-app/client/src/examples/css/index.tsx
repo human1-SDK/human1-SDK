@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { ResponseData } from '../../types';
 import { apiClient } from '../../services/apiClient';
-import { useNaturalLanguageQuery } from '../../hooks/useNaturalLanguageQuery';
-
 import { 
   QuerySection, 
   ExampleQueries, 
   QueryHistory, 
   HealthIndicator, 
-  FileDropZone 
+  FileDropZone,
+  useNaturalLanguageQuery,
+  ResponseData
 } from '@human1-sdk/ui';
 
 import { API_URL, HEALTH_CHECK_INTERVAL } from '../../config';

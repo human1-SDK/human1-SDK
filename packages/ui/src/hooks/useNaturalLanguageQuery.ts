@@ -101,9 +101,19 @@ export const useNaturalLanguageQuery = (
     setIsLoading(true);
     setError(null);
 
+    // NAT CHANGES
     try {
       const response = await client.query(queryToExecute, responseFormat);
-      const formattedResult = formatQueryResponse(response);
+      let formattedResult = formatQueryResponse(response);
+      
+      // Enforce the requested format type if provided
+      if (responseFormat && formattedResult.type !== 'error') {
+        formattedResult = {
+          ...formattedResult,
+          type: responseFormat
+        } as ResponseData;
+      }
+      
       setResult(formattedResult);
       
       if (onSuccess) {
