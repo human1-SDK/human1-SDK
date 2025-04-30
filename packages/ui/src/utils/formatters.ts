@@ -69,7 +69,7 @@ export const formatQueryResponse = (result: any): ResponseData => {
       data: {
         text: typeof result === 'string' 
           ? result 
-          : `Query completed successfully. ${JSON.stringify(result, null, 2)}`
+          : `${JSON.stringify(result, null, 2)}`
       } as ParagraphData
     };
   } catch (error) {

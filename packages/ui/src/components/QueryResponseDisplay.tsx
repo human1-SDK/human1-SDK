@@ -38,7 +38,10 @@ export const QueryResponseDisplay: React.FC<QueryResponseDisplayProps> = ({
       )}
 
       {data.type === 'table' && (
-        <TableView data={data.data} />
+          <TableView data={'text' in data.data && typeof data.data.text === 'string' 
+            ? JSON.parse(data.data.text) 
+            : data.data} 
+          />
       )}
 
       {data.type === 'paragraph' && (

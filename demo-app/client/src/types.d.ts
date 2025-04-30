@@ -16,6 +16,7 @@ declare module '@human1-sdk/ui' {
   export interface TableData {
     columns: string[];
     rows: any[][];
+    text?: string;
   }
   
   export interface ParagraphData {

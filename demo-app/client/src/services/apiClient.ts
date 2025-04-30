@@ -3,11 +3,13 @@ import axios from 'axios';
 export interface QueryResult {
   type: 'table' | 'paragraph' | 'error';
   data: {
-    columns?: string[];
-    rows?: any[][];
-    text?: string;
-    message?: string;
-    suggestions?: string[];
+    text?: string | {
+      columns?: string[],
+      rows?: any[][],
+      text?: string,
+      message?: string,
+      suggestions?: string[]
+    }
   };
 }
 
