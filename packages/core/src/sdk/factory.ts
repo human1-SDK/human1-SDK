@@ -45,33 +45,42 @@ export function createSDK(): CallableSDK {
   // Create a callable function that handles everything in one call
   const initializerFn = (appOrOptions?: any): ServerResult => {
     let options = {};
-    let expressApp: Express | null = null;
     
     // Check if first argument is an Express app
     if (appOrOptions && typeof appOrOptions.use === 'function' && typeof appOrOptions.listen === 'function') {
-      // Connect to Express
-      expressApp = appOrOptions;
+      // Connect to Express - this is the most reliable approach
+      const expressApp: Express = appOrOptions;
+      // Store the app for this instance and also make it globally available
+      instance.express(expressApp);
+      lastDetectedExpressApp = expressApp;
+      lastExpressMap.set(instance, expressApp);
+      console.log('Human1 SDK: Express app explicitly provided');
     } else if (appOrOptions) {
       // It's options
       options = appOrOptions;
+      
+      // Try auto-detection since no Express app was provided
+      const expressApp = lastDetectedExpressApp || autoDetectExpressApp();
+      if (expressApp) {
+        // If we found an app, connect to it
+        instance.express(expressApp);
+        lastDetectedExpressApp = expressApp;
+        lastExpressMap.set(instance, expressApp);
+        console.log('Human1 SDK: Express app auto-detected during options initialization');
+      }
     } else {
       // No arguments provided, try to auto-detect Express
-      expressApp = lastDetectedExpressApp || autoDetectExpressApp();
+      const expressApp = lastDetectedExpressApp || autoDetectExpressApp();
       
       if (expressApp) {
-        console.log('Human1 SDK: Express app auto-detected');
-        // Store for future use
+        // Store and connect to the app
+        instance.express(expressApp);
         lastDetectedExpressApp = expressApp;
+        lastExpressMap.set(instance, expressApp);
+        console.log('Human1 SDK: Express app auto-detected during empty initialization');
       } else {
         console.log('Human1 SDK: No Express app detected');
       }
-    }
-    
-    // Apply the Express app if we found one
-    if (expressApp) {
-      instance.express(expressApp);
-      // Store the Express app in the instance map for future reference
-      lastExpressMap.set(instance, expressApp);
     }
     
     // Make sure environment is loaded with any options passed directly
@@ -131,24 +140,40 @@ export function createSDK(): CallableSDK {
   const callableSdk = makeCallable(instance, initializerFn) as unknown as CallableSDK;
   
   /**
-   * Bug fix for getExpressApp in the callable SDK
+   * More reliable implementation of getExpressApp in the callable SDK
    * 
    * This ensures the SDK returns the correct Express app after auto-detection
-   * by adding fallback mechanisms if the direct property access fails.
+   * by using a hierarchical approach to finding the Express app:
+   * 1. Check the instance's expressApp property
+   * 2. Check the lastExpressMap for this instance
+   * 3. Check the lastDetectedExpressApp global cache
    */
-  // BUGFIX: Properly override getExpressApp in the callable SDK
-  // This ensures the SDK returns the correct Express app after auto-detection
   const originalGetExpressApp = callableSdk.getExpressApp;
   callableSdk.getExpressApp = function(): Express | null {
+    // First try the original method
     const expressApp = originalGetExpressApp.call(this);
     if (expressApp) {
       return expressApp;
     }
     
-    // Fallback: Try to get from lastExpressMap if not directly accessible
+    // Next, try to get from lastExpressMap if not directly accessible
     if (lastExpressMap.has(instance)) {
+      // The get method on WeakMap is guaranteed to return T or undefined
       const savedApp = lastExpressMap.get(instance);
-      return savedApp || null;
+      // TypeScript knows that if we're in this block, the app exists in the map
+      // But we still need to handle undefined for typechecking (though it should never happen)
+      if (savedApp) {
+        // If found in map but not on instance, restore it
+        instance.express(savedApp);
+        return savedApp;
+      }
+    }
+    
+    // Finally, check the global lastDetectedExpressApp
+    if (lastDetectedExpressApp) {
+      // If we have a globally detected app but it's not on this instance, set it
+      instance.express(lastDetectedExpressApp);
+      return lastDetectedExpressApp;
     }
     
     return null;

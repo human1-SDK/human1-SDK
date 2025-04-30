@@ -69,63 +69,181 @@ export class Client {
       temperature: 0.5,
       apiKey: this.openAiKey,
       modelKwargs: {
-        response_format: "json_object",
+        response_format: {type: "json_object"},   // NAT CHANGES
       },
     });
   }
 
   async langchainSQL(userQuery: string, responseFormat?: "table" | "paragraph"): Promise<any> {
-    // const promptTemplate =
-    //   'Translate this sentence to a SQL query. dont show more than 1000 records. avoid sql keywords and Use ONLY these tables:\n\n{table_info}\n\nQuestion: {input}';
-    const prompt = await pull<ChatPromptTemplate>(
-      "hwchase17/openai-tools-agent"
-    );
+    try {
+      // const promptTemplate =
+      //   'Translate this sentence to a SQL query. dont show more than 1000 records. avoid sql keywords and Use ONLY these tables:\n\n{table_info}\n\nQuestion: {input}';
+      const prompt = await pull<ChatPromptTemplate>(
+        "hwchase17/openai-tools-agent"
+      );
 
-    const customPrompt = ChatPromptTemplate.fromMessages([
-      [
-        "system",
-        "You are a helpful assistant. Respond only with JSON format only",
-      ],
-      ...prompt.promptMessages,
-    ]);
+      const customPrompt = ChatPromptTemplate.fromMessages([
+        [
+          "system",
+          "You are a helpful assistant. Respond only with JSON format only",
+        ],
+        ...prompt.promptMessages,
+      ]);
 
-    //Langchain-SQL Connection <<<
-    // Create a LangChain SqlDatabase from TypeORM DataSource
-    const db = await SqlDatabase.fromDataSourceParams({
-      appDataSource: this.dataSource,
-    });
-    // Create the SQL Toolkit
-    const toolkit = new SqlToolkit(db, this.llm);
+      //Langchain-SQL Connection <<<
+      // Create a LangChain SqlDatabase from TypeORM DataSource
+      const db = await SqlDatabase.fromDataSourceParams({
+        appDataSource: this.dataSource,
+      });
+      // Create the SQL Toolkit
+      const toolkit = new SqlToolkit(db, this.llm);
 
-    // Create the agent using the new method
-    const agent = await createOpenAIToolsAgent({
-      llm: this.llm,
-      tools: toolkit.tools,
-      prompt: customPrompt,
-    });
+      // Create the agent using the new method
+      const agent = await createOpenAIToolsAgent({
+        llm: this.llm,
+        tools: toolkit.tools,
+        prompt: customPrompt,
+      });
 
-    // Create the agent executor
-    const executor = new AgentExecutor({
-      agent,
-      tools: toolkit.tools,
-      verbose: false,
-    });
+      // Create the agent executor
+      const executor = new AgentExecutor({
+        agent,
+        tools: toolkit.tools,
+        verbose: false,
+      });
 
-    // Use the executor to process an input
-    const res = await executor.invoke({
-      input: userQuery,
-    });
-    // console.log('langchain stuff here ->>', res.output);
-    // console.log('res  here ->>', res);
+      // Use the executor to process an input
+      const res = await executor.invoke({
+        input: userQuery,
+      });
+      
+      console.log('langChain response:', res.output);
 
-    const langChainResponse = {
-      // summary: resultSummary.content,
-      table: res.output,
-    };
+      const langChainResponse = {
+        table: res.output,
+      };
 
-    console.log(langChainResponse.table);
+      // Try to parse the result as JSON
+      try {
+        const parsed = JSON.parse(langChainResponse.table);
 
-    return langChainResponse;
+        // Get the first array of objects from the parsed object
+        const firstKey = Object.keys(parsed)[0];
+        
+        // Check if there's no firstKey or it doesn't exist in the parsed object
+        if (!firstKey || !parsed[firstKey]) {
+          if (responseFormat === "paragraph") {
+            return {
+              text: JSON.stringify(parsed, null, 2)
+            };
+          } else {
+            // For table format, return the full result as columns/rows if possible
+            if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+              const columns = Object.keys(parsed);
+              const rows = [columns.map(col => parsed[col])];
+              return { columns, rows };
+            } else {
+              return {
+                text: JSON.stringify(parsed, null, 2)
+              };
+            }
+          }
+        }
+        
+        const records = parsed[firstKey];
+
+        // Validate it's an array of objects
+        if (!Array.isArray(records)) {
+          // If not an array but we're in paragraph mode, return as text
+          if (responseFormat === "paragraph") {
+            return {
+              text: JSON.stringify(parsed, null, 2)
+            };
+          }
+          
+          // Try to convert non-array to a table format if possible
+          if (typeof records === 'object') {
+            const columns = Object.keys(records);
+            const rows = [columns.map(col => records[col])];
+            return { columns, rows };
+          }
+          
+          // Fallback to returning as text
+          return {
+            text: JSON.stringify(parsed, null, 2)
+          };
+        }
+        
+        // If array is empty or first item isn't an object
+        if (records.length === 0 || typeof records[0] !== 'object') {
+          if (responseFormat === "paragraph") {
+            return {
+              text: JSON.stringify(parsed, null, 2)
+            };
+          }
+          
+          // If it's an array of primitive values, create a simple table
+          if (records.length > 0) {
+            return {
+              columns: ["Value"],
+              rows: records.map(value => [value])
+            };
+          }
+          
+          // Empty array, return empty table
+          return {
+            columns: [],
+            rows: []
+          };
+        }
+
+        // Dynamically extract columns and rows
+        const columns = Object.keys(records[0]);
+        const rows = records.map(record => columns.map(col => record[col]));
+
+        // Format output based on responseFormat
+        if (responseFormat === "paragraph") {
+          return {
+            text: JSON.stringify({ columns, rows }, null, 2)
+          };
+        }
+        
+        return {
+          columns,
+          rows,
+        };
+      } catch (parseError) {
+        console.error("Failed to parse JSON response:", parseError);
+        
+        // If we couldn't parse as JSON, return as text
+        if (responseFormat === "paragraph") {
+          return {
+            text: langChainResponse.table
+          };
+        }
+        
+        // For table format, create a fallback table with the error
+        return {
+          columns: ["Message"],
+          rows: [[`Failed to parse result: ${langChainResponse.table.substring(0, 100)}...`]]
+        };
+      }
+    } catch (error) {
+      console.error("Error in langchainSQL:", error);
+      
+      // Return appropriate error format based on responseFormat
+      if (responseFormat === "paragraph") {
+        return {
+          text: `Error: ${error instanceof Error ? error.message : String(error)}`
+        };
+      }
+      
+      // Return error in table format
+      return {
+        columns: ["Error"],
+        rows: [[`${error instanceof Error ? error.message : String(error)}`]]
+      };
+    }
   }
 }
 

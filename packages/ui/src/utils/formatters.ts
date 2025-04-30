@@ -19,6 +19,17 @@ export const formatQueryResponse = (result: any): ResponseData => {
       };
     }
 
+    // Handle columns and rows directly in the result
+    if (result.columns && result.rows && Array.isArray(result.columns) && Array.isArray(result.rows)) {
+      return {
+        type: 'table',
+        data: {
+          columns: result.columns,
+          rows: result.rows
+        } as TableData
+      };
+    }
+
     // Handle table data
     if (result.data && Array.isArray(result.columns) && Array.isArray(result.rows)) {
       return {
@@ -30,8 +41,51 @@ export const formatQueryResponse = (result: any): ResponseData => {
       };
     }
 
+    // Check if the result or result.data contains a JSON string with columns and rows
+    if (typeof result === 'string' || (result.data && typeof result.data.text === 'string')) {
+      const jsonString = typeof result === 'string' ? result : result.data.text;
+      try {
+        const parsedData = JSON.parse(jsonString);
+        if (parsedData.columns && parsedData.rows && 
+            Array.isArray(parsedData.columns) && Array.isArray(parsedData.rows)) {
+          return {
+            type: 'table',
+            data: {
+              columns: parsedData.columns,
+              rows: parsedData.rows
+            } as TableData
+          };
+        }
+      } catch (e) {
+        // Not valid JSON or doesn't have the expected structure, continue to other checks
+      }
+    }
+
     // Handle paragraphs/text
     if (typeof result.text === 'string') {
+      // Try to parse the text as JSON to check if it's a table structure
+      try {
+        const parsedData = JSON.parse(result.text);
+        if (parsedData.columns && parsedData.rows && 
+            Array.isArray(parsedData.columns) && Array.isArray(parsedData.rows)) {
+          return {
+            type: 'table',
+            data: {
+              columns: parsedData.columns,
+              rows: parsedData.rows
+            } as TableData
+          };
+        }
+      } catch (e) {
+        // Not valid JSON, treat as plain text
+        return {
+          type: 'paragraph',
+          data: {
+            text: result.text
+          } as ParagraphData
+        };
+      }
+
       return {
         type: 'paragraph',
         data: {
@@ -42,6 +96,25 @@ export const formatQueryResponse = (result: any): ResponseData => {
 
     // If the structure doesn't match expected formats, try to intelligently handle it
     if (result.data) {
+      // Check if data is a string that might be a JSON representation of a table
+      if (typeof result.data === 'string') {
+        try {
+          const parsed = JSON.parse(result.data);
+          if (parsed.columns && parsed.rows && 
+              Array.isArray(parsed.columns) && Array.isArray(parsed.rows)) {
+            return {
+              type: 'table',
+              data: {
+                columns: parsed.columns,
+                rows: parsed.rows
+              } as TableData
+            };
+          }
+        } catch (e) {
+          // Not valid JSON, continue to other checks
+        }
+      }
+
       // If data is an object with keys, convert to a table
       if (typeof result.data === 'object' && !Array.isArray(result.data)) {
         const columns = Object.keys(result.data);
@@ -69,7 +142,7 @@ export const formatQueryResponse = (result: any): ResponseData => {
       data: {
         text: typeof result === 'string' 
           ? result 
-          : `Query completed successfully. ${JSON.stringify(result, null, 2)}`
+          : `${JSON.stringify(result, null, 2)}`
       } as ParagraphData
     };
   } catch (error) {

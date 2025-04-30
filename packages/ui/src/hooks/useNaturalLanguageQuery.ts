@@ -101,9 +101,81 @@ export const useNaturalLanguageQuery = (
     setIsLoading(true);
     setError(null);
 
+    // NAT CHANGES
     try {
+      console.log('Executing query with format:', responseFormat);
       const response = await client.query(queryToExecute, responseFormat);
-      const formattedResult = formatQueryResponse(response);
+      console.log('Raw response from query:', response);
+      
+      // Handle different response formats
+      let formattedResult: ResponseData;
+      
+      if (responseFormat === 'paragraph') {
+        // For paragraph format, check if the response has the text property
+        if (response && typeof response.text === 'string') {
+          formattedResult = {
+            type: 'paragraph',
+            data: {
+              text: response.text
+            }
+          };
+        } else if (response && response.data && typeof response.data.text === 'string') {
+          formattedResult = {
+            type: 'paragraph',
+            data: {
+              text: response.data.text
+            }
+          };
+        } else if (response && response.error) {
+          // Handle error response
+          formattedResult = {
+            type: 'error',
+            data: {
+              message: typeof response.error === 'string' ? response.error : 
+                      (response.error.message || 'Unknown error'),
+              suggestions: ['Try a different query', 'Check database connection']
+            }
+          };
+        } else {
+          // If no text property is found, try to convert to JSON string
+          const jsonText = JSON.stringify(response, null, 2);
+          formattedResult = {
+            type: 'paragraph',
+            data: {
+              text: jsonText
+            }
+          };
+        }
+      } else if (response && response.columns && Array.isArray(response.columns)) {
+        // It's already in table format
+        formattedResult = {
+          type: 'table',
+          data: response
+        };
+      } else if (response && response.error) {
+        // Handle error response
+        formattedResult = {
+          type: 'error',
+          data: {
+            message: typeof response.error === 'string' ? response.error : 
+                    (response.error.message || 'Unknown error'),
+            suggestions: ['Try a different query', 'Check database connection']
+          }
+        };
+      } else {
+        // For other formats or when no format is specified, use the formatter
+        formattedResult = formatQueryResponse(response);
+        
+        // Still enforce the requested format if provided
+        if (responseFormat && formattedResult.type !== 'error') {
+          formattedResult = {
+            ...formattedResult,
+            type: responseFormat
+          } as ResponseData;
+        }
+      }
+      
+      console.log('Formatted result:', formattedResult);
       setResult(formattedResult);
       
       if (onSuccess) {
@@ -111,6 +183,7 @@ export const useNaturalLanguageQuery = (
       }
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Query error:', error);
       setError(error);
       
       // Create an error response

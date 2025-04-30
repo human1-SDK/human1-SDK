@@ -14,7 +14,7 @@ export interface QueryResult {
 }
 
 export interface QueryClient {
-  query: (query: string) => Promise<QueryResult>;
+  query: (query: string, responseFormat?: "table" | "paragraph") => Promise<QueryResult>;
   executeQuery: (query: string) => Promise<ResponseData>;
 }
 
@@ -45,4 +45,4 @@ export const apiClient: QueryClient = {
       throw error;
     }
   }
-}; 
+};
