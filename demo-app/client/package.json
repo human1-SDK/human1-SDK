@@ -11,9 +11,9 @@
     "react-router-dom": "^6.0.0"
   },
   "scripts": {
-    "dev": "NODE_ENV=development VITE_UI_SRC=true npx vite --force",
-    "dev:script": "NODE_ENV=development VITE_UI_SRC=true npx vite --force",
-    "build": "NODE_ENV=production npx vite build",
+    "dev": "cross-env NODE_ENV=development VITE_UI_SRC=true npx vite --force",
+    "dev:script": "cross-env NODE_ENV=development VITE_UI_SRC=true npx vite --force",
+    "build": "cross-env NODE_ENV=production npx vite build",
     "preview": "npx vite preview",
     "clean": "rm -rf dist",
     "clean:all": "rm -rf dist node_modules package-lock.json && cd ../../packages/ui && npm run clean",
