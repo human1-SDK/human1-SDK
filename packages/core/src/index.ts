@@ -3,7 +3,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { SqlToolkit } from "langchain/agents/toolkits/sql";
 import { SqlDatabase } from "langchain/sql_db";
 import { AgentExecutor, createOpenAIToolsAgent } from "langchain/agents";
-
+import { RunnableSequence } from "@langchain/core/runnables";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { pull } from "langchain/hub";
 
@@ -72,6 +72,53 @@ export class Client {
         response_format: {type: "json_object"},   // NAT CHANGES
       },
     });
+  }
+
+  private formatSQLResultForSummary(
+    sqlResult: Record<string, any>[],
+    maxRows?: number
+  ): string {
+    const rows = sqlResult.slice(0, maxRows ? maxRows : sqlResult.length);
+
+    return rows
+      .map((row) =>
+        Object.entries(row)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(", ")
+      )
+      .join("\n");
+  }
+
+  private buildSummaryChain(isSingleRow: boolean) {
+    const prompt = ChatPromptTemplate.fromTemplate(
+      isSingleRow
+        ? `The user asked: "{userQuery}"\n` +
+            `Here is the SQL result:\n{compactResult}\n\n` +
+            `Write a short paragraph summarizing the results.`
+        : `The user asked: "{userQuery}"\n` +
+            `Here are the results:\n{compactResult}\n\n` +
+            `Summarize the results, use bullet points if necessary.`
+    );
+
+    return RunnableSequence.from([prompt, this.llm]);
+  }
+
+  private async summarizeResult(
+    userQuery: string,
+    sqlOutput: Record<string, any>[]
+  ): Promise<string> {
+    const isSingleRow = sqlOutput.length === 1;
+    const compactResult = this.formatSQLResultForSummary(sqlOutput);
+
+    const summaryChain = this.buildSummaryChain(isSingleRow);
+    const resultSummary = await summaryChain.invoke({
+      userQuery,
+      compactResult,
+    });
+
+    return typeof resultSummary.content === "string"
+      ? resultSummary.content
+      : JSON.stringify(resultSummary.content);
   }
 
   async langchainSQL(userQuery: string, responseFormat?: "table" | "paragraph"): Promise<any> {
