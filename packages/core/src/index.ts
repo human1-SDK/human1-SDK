@@ -68,9 +68,6 @@ export class Client {
       model: "gpt-4o-mini",
       temperature: 0.5,
       apiKey: this.openAiKey,
-      modelKwargs: {
-        response_format: { type: "json_object" }, // NAT CHANGES
-      },
     });
   }
 
@@ -134,7 +131,7 @@ export class Client {
     const customPrompt = ChatPromptTemplate.fromMessages([
       [
         "system",
-        "You are a helpful assistant. Respond only with JSON format only",
+        "You are a helpful assistant. Respond only with an array of JSON objects without backticks or quotes",
       ],
       ...prompt.promptMessages,
     ]);
@@ -173,28 +170,12 @@ export class Client {
       table: res.output,
     };
 
-    let parsed = parseIfJSON(langChainResponse.table);
-
-    parsed = Array.isArray(parsed) ? parsed : [parsed];
+    const results = JSON.parse(langChainResponse.table);
     
     if (responseFormat === "table") {
-      console.log("in responseFormat table");
-      // Get the first array of objects from the parsed object
-      const firstKey = Object.keys(parsed)[0];
-      const records = parsed[firstKey];
-
-      // Validate it's an array of objects
-      if (
-        !Array.isArray(records) ||
-        records.length === 0 ||
-        typeof records[0] !== "object"
-      ) {
-        throw new Error("Unexpected format: expected an array of objects.");
-      }
-
       // Dynamically extract columns and rows
-      const columns = Object.keys(records[0]);
-      const rows = records.map((record) => columns.map((col) => record[col]));
+      const columns = Object.keys(results[0]);
+      const rows = results.map((record: any) => columns.map((col) => record[col]));
 
       return {
         columns,
@@ -202,10 +183,9 @@ export class Client {
       };
     } else if (responseFormat === "paragraph") {
       //TODO: Include maxRows????
-      console.log("in responseFormat paragraph");
       return await this.summarizeResult(
         userQuery,
-        parsed as Record<string, any>[]
+        results as Record<string, any>[]
       );
     }
   }
@@ -215,14 +195,6 @@ export class Client {
 export * from "./types";
 export * from "./server";
 export * from "./utils";
-
-const parseIfJSON = (input: any) => {
-  try {
-    return JSON.parse(input);
-  } catch (e) {
-    return input;
-  }
-};
 
 // async langchainSQL(userQuery: string, responseFormat?: "table" | "paragraph"): Promise<any> {
 //   try {
