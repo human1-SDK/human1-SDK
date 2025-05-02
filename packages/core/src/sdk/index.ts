@@ -1,20 +1,24 @@
 /**
- * Human1 SDK Core Module
+ * Human1 SDK Module Index
  * 
- * This is the entry point for the Human1 SDK. It exports the key components that
- * enable the Human1 SDK functionality, including the main Human1 class, callable
- * SDK wrapper, factory functions, and auto-detection functionality.
+ * This is the main entry point for the SDK. It exports the factory functions,
+ * main classes, and utility functions needed to use the SDK.
  * 
- * The default export is a pre-initialized SDK instance created by the factory.
+ * For backward compatibility, it maintains the same exports as the original SDK.
  */
 
-// Export component classes for advanced usage scenarios
-export { Human1 } from './human1-class';
-export { CallableSDK } from './callable-sdk';
-export { createSDK, human1 } from './factory';
+// Re-export the original exports for backward compatibility
 export { autoDetectExpressApp } from './auto-detect';
 
-// Export the factory functions as default
+// Export from the new implementation
+import { Human1, CallableSDK, createSDK, human1 } from './core';
+export { Human1 } from './core';
+export { CallableSDK } from './core';
+export { createSDK, human1 } from './core';
+
+// Export from platform modules
+export { registerExpressApp } from './platform/express';
+
+// Re-export as default for the most common use case
 // This creates a singleton SDK instance that's ready to use
-import { createSDK } from './factory';
 export default createSDK(); 
