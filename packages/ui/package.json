@@ -71,7 +71,8 @@
   "dependencies": {
     "axios": "^1.0.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "react-markdown": "^8.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -86,9 +87,9 @@
     "@storybook/react": "^8.0.0",
     "@storybook/react-webpack5": "^8.0.0",
     "@storybook/testing-library": "^0.2.0",
+    "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
-    "@testing-library/dom": "^10.0.0",
     "@types/jest": "^29.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -108,9 +109,9 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
+    "@testing-library/dom": "^10.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "@testing-library/dom": "^10.0.0",
     "tailwindcss": "^3.0.0"
   }
 }

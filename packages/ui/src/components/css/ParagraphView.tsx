@@ -1,5 +1,28 @@
 import React from 'react';
 import { ParagraphViewProps } from '../../types';
+import ReactMarkdown from "react-markdown";
+
+const MarkdownViewer = ({ markdown }: { markdown: string }) => {
+  // Pre-process the markdown to ensure line breaks are respected
+  const processedMarkdown = markdown
+    .replace(/\\n\\n/g, '\n\n') // Replace literal \n\n with actual double newlines
+    .replace(/\\n/g, '\n')      // Replace literal \n with actual newlines
+    .replace(/\n\n/g, '\n\n')   // Preserve paragraph breaks (double newlines)
+    .replace(/\n(?!\n)/g, '  \n'); // Add two spaces before single newlines (but not double)
+    
+  return (
+    <div className="prose">
+      <ReactMarkdown 
+        components={{
+          p: ({node, ...props}) => <p style={{whiteSpace: 'pre-wrap'}} {...props} />,
+          br: () => <br />
+        }}
+      >
+        {processedMarkdown}
+      </ReactMarkdown>
+    </div>
+  );
+};
 
 /**
  * Tries to identify if text is JSON and formats it nicely
@@ -98,41 +121,7 @@ export const ParagraphView: React.FC<ParagraphViewProps> = ({
   }
   
   // For regular text, split by newlines to create paragraphs
-  const paragraphs = formattedText.split('\n').filter(p => p.trim());
-
   return (
-    <div 
-      className={`human1-paragraph-container ${className}`}
-      style={{ 
-        padding: '16px',
-        borderRadius: '4px',
-        backgroundColor: 'white',
-        border: '1px solid #e0e0e0',
-        ...style
-      }}
-    >
-      {paragraphs.length > 0 ? (
-        paragraphs.map((paragraph, index) => (
-          <p 
-            key={`p-${index}`}
-            style={{ 
-              margin: '0 0 16px',
-              lineHeight: '1.6',
-              fontSize: '16px',
-            }}
-          >
-            {paragraph}
-          </p>
-        ))
-      ) : (
-        <p style={{ 
-          margin: '0',
-          lineHeight: '1.6',
-          fontSize: '16px',
-        }}>
-          {formattedText || 'No content to display'}
-        </p>
-      )}
-    </div>
+    <MarkdownViewer markdown={data.text} />
   );
 }; 
